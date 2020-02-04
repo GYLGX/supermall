@@ -1,6 +1,7 @@
 <template>
   <div class='GoodsList'>
     <goods-list-item v-for='item in goods' :goods-item='item'></goods-list-item>
+    <slot></slot>
   </div>
 </template>
 <script>
@@ -23,7 +24,7 @@
   .GoodsList {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-evenly;
     padding: 3px;
   }
 

@@ -5,16 +5,22 @@
       <div slot='center'>特惠街</div>
     </nav-bar>
 
-    //滚动插件
-    <scroll class="content" ref='scroll' :probe-type=3 @scroll='onscrollTop'>
+    <!-- 文字分类栏 -->
+    <tab-control class="tab-control1" :titles="['流行','型款','精选']" @tabclick='tabclick' v-show='tabControlShow'
+      ref='tabControl1'>
+    </tab-control>
+    <!-- 滚动插件 -->
+    <scroll class="content" ref='scroll' :probe-type=3 @scroll='onscrollTop' :pull-up-load='true'
+      @pullingUp='pullingUp'>
       <!-- 轮播图 -->
-      <home-swiper :banners='banners'></home-swiper>
+      <home-swiper :banners='banners' @swiperImageLoad='swiperImageLoad'></home-swiper>
       <!-- 图片分类栏 -->
       <recommend-view :recommends='recommends'></recommend-view>
       <!-- 图片链接 -->
       <feature-view></feature-view>
       <!-- 文字分类栏 -->
-      <tab-control class="tab-control" :titles="['流行','型款','精选']" @tabclick='tabclick'></tab-control>
+      <tab-control class="tab-control2" :titles="['流行','型款','精选']" @tabclick='tabclick' ref='tabControl2'>
+      </tab-control>
       <!-- 分类下的商品 -->
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
@@ -39,6 +45,9 @@
     getHomeMultidata,
     getHomeGoodsdata
   } from 'network/home'
+  import {
+    debounce
+  } from 'common/utils'
 
   export default {
     name: 'Home',
@@ -61,7 +70,10 @@
           }
         },
         currenType: 'new',
-        scrollTop: false
+        scrollTop: false,
+        tabControlShow: false,
+        SwiperOffsetTop: 0,
+        scrollY: 0
       }
     },
     components: {
@@ -94,10 +106,20 @@
     //当template挂载到dom上会回调的
     mounted() {
       //监听item 中图片加载是否完成
-      const refresh = this.debounce(this.$refs.scroll.refresh, 20)
+      const refresh = debounce(this.$refs.scroll.refresh)
       this.$bus.$on('itemImageLoad', () => {
         refresh()
       })
+    },
+    //当前主键处于活跃时调用
+    activated() {
+      this.$refs.scroll.backtop(0, this.scrollY);
+      this.$refs.scroll.refresh();
+    },
+    //当前组件离开时调用
+    deactivated() {
+      this.scrollY = this.$refs.scroll.scrollY()
+
     },
     methods: {
       /*
@@ -116,13 +138,9 @@
             this.currenType = 'sell'
             break
         }
-        // if (index === 0) {
-        //   this.currenType = 'pop'
-        // } else if (index === 1) {
-        //   this.currenType = 'new'
-        // } else if (index === 2) {
-        //   this.currenType = 'sell'
-        // }
+        this.$refs.tabControl1.currentIndex = index;
+        this.$refs.tabControl2.currentIndex = index;
+        this.$refs.scroll.backtop(0, -this.SwiperOffsetTop, 0)
       },
 
       //回到顶部
@@ -130,21 +148,22 @@
         this.$refs.scroll.backtop(0, 0)
       },
 
-      //到指定位置显示置顶图标
+      //scroll滚动时的事件监听
       onscrollTop(position) {
+        //到指定位置显示置顶图标
         this.scrollTop = -position.y > 1000
-      },
+        //tabControl吸顶
+        this.tabControlShow = -position.y > this.SwiperOffsetTop
 
-      //防抖函数
-      debounce(func, delay) {
-        let timer = null
-        return (...args) => {
-          if (timer) clearTimeout(timer)
-          timer = setTimeout(() => {
-            func.apply(this, args)
-            console.log(timer);
-          }, delay)
-        }
+      },
+      //上拉加载数据
+      pullingUp() {
+        this.getHomeGoodsdata(this.currenType)
+        this.$refs.scroll.finishPullUp()
+      },
+      //等轮播图加载出来后，就计算tab-contro 的位置高度
+      swiperImageLoad() {
+        this.SwiperOffsetTop = this.$refs.tabControl2.$el.offsetTop
       },
 
       /*
@@ -163,6 +182,7 @@
         getHomeGoodsdata(type, page).then(res => {
           this.goods[type].list.push(...res.data.list)
         })
+        // console.log(this.$refs);
       }
     },
   }
@@ -172,17 +192,11 @@
   .home-nav {
     background-color: var(--color-tint);
     color: #fff;
-    position: fixed;
-    z-index: 10;
-    right: 0;
-    left: 0;
-    top: 0;
   }
 
-  .tab-control {
-    position: sticky;
-    top: 44px;
-    /* background-color: white; */
+  .tab-control1 {
+    position: relative;
+    z-index: 10;
   }
 
   .content {

@@ -5,6 +5,7 @@ const Home = () => import('views/home/Home')
 const Cart = () => import('views/cart/Cart')
 const Category = () => import('views/category/Category')
 const Prfile = () => import('views/prfile/Prfile')
+const Detail = () => import('views/detail/Detail')
 
 Vue.use(VueRouter)
 
@@ -23,6 +24,9 @@ const routes = [{
 }, {
   path: '/prfile',
   component: Prfile
+}, {
+  path: '/detail',
+  component: Detail
 }]
 
 const router = new VueRouter({
