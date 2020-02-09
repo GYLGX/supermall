@@ -30,7 +30,8 @@
         this.$router.back()
       },
       titlesClick(index) {
-        this.detailType = index
+        this.detailType = index;
+        this.$emit('titleClick', index);
       }
     },
   }

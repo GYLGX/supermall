@@ -20,7 +20,7 @@
     props: {
       interval: {
         type: Number,
-        default: 3000
+        default: 3001
       },
       animDuration: {
         type: Number,

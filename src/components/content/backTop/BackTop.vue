@@ -16,6 +16,7 @@
     right: 7px;
     bottom: 60px;
     height: 40px;
+    z-index: 20;
   }
 
 </style>

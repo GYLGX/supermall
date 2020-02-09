@@ -25,16 +25,19 @@
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
     <back-top @click.native='backClick' v-show='scrollTop' />
-
   </div>
 </template>
 <script>
+  import {
+    itemListenerMixin,
+    scrollTopMixin
+  } from 'common/mixin'
+
   import NavBar from 'components/common/navbar/NavBar'
   import Scroll from 'components/common/scroll/Scroll'
 
   import TabControl from 'components/content/tabcontrol/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
-  import BackTop from 'components/content/backTop/BackTop'
 
   import HomeSwiper from './childComps/HomeSwiper'
   import RecommendView from './childComps/RecommendView'
@@ -45,9 +48,7 @@
     getHomeMultidata,
     getHomeGoodsdata
   } from 'network/home'
-  import {
-    debounce
-  } from 'common/utils'
+
 
   export default {
     name: 'Home',
@@ -70,12 +71,12 @@
           }
         },
         currenType: 'new',
-        scrollTop: false,
         tabControlShow: false,
         SwiperOffsetTop: 0,
         scrollY: 0
       }
     },
+    mixins: [itemListenerMixin, scrollTopMixin],
     components: {
       NavBar,
       Scroll,
@@ -84,8 +85,7 @@
 
       HomeSwiper,
       RecommendView,
-      FeatureView,
-      BackTop
+      FeatureView
     },
     computed: {
       showGoods() {
@@ -104,22 +104,20 @@
 
     },
     //当template挂载到dom上会回调的
-    mounted() {
-      //监听item 中图片加载是否完成
-      const refresh = debounce(this.$refs.scroll.refresh)
-      this.$bus.$on('itemImageLoad', () => {
-        refresh()
-      })
-    },
+    mounted() {},
     //当前主键处于活跃时调用
     activated() {
+      //回到指定位置
       this.$refs.scroll.backtop(0, this.scrollY);
+      //刷新
       this.$refs.scroll.refresh();
     },
     //当前组件离开时调用
     deactivated() {
+      // 记录离开时的位置
       this.scrollY = this.$refs.scroll.scrollY()
-
+      //删除$bus里面的方法
+      this.$bus.$off('itemImageLoad', this.listImageLoad)
     },
     methods: {
       /*
@@ -143,15 +141,10 @@
         this.$refs.scroll.backtop(0, -this.SwiperOffsetTop, 0)
       },
 
-      //回到顶部
-      backClick() {
-        this.$refs.scroll.backtop(0, 0)
-      },
-
       //scroll滚动时的事件监听
       onscrollTop(position) {
         //到指定位置显示置顶图标
-        this.scrollTop = -position.y > 1000
+        this.showTop(position)
         //tabControl吸顶
         this.tabControlShow = -position.y > this.SwiperOffsetTop
 

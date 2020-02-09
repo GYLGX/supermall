@@ -28,6 +28,7 @@ export class Goods {
     this.columns = columns
     this.services = services
     this.realPrice = itemInfo.highNowPrice //最高价
+    this.lowNowPrice = itemInfo.lowNowPrice //最低价
   }
 }
 export class Shop {

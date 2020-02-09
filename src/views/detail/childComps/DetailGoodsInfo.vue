@@ -13,7 +13,6 @@
     components: {},
     data() {
       return {
-        counter: 0,
         imagesLength: 0
       }
     },
@@ -25,10 +24,7 @@
     },
     methods: {
       imageLoad() {
-        this.counter++;
-        if (this.counter === this.imagesLength) {
-          this.$emit('imageload');
-        }
+        this.$emit('imageload');
       }
     },
     watch: {

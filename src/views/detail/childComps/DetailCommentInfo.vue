@@ -1,10 +1,11 @@
 <template>
-  <div class='detail-comment-info' v-if='Object.keys(commentInfo).length !=0'>
+  <div class='detail-comment-info'>
     <div class="comment-top">
       <span>用户评论</span>
-      <span>更多</span>
+      <span v-if='Object.keys(commentInfo).length !=0'>更多</span>
     </div>
-    <div class="comment-body">
+    <div class="nocomment" v-if='Object.keys(commentInfo).length === 0'>暂无评论</div>
+    <div class="comment-body" v-if='Object.keys(commentInfo).length !=0'>
       <div class="logo">
         <img :src="commentInfo.user.avatar" alt="">
         <span>{{commentInfo.user.uname}}</span>
@@ -14,6 +15,9 @@
         <p>
           <span class="deta">{{getDate}}</span>
           <span>{{commentInfo.style}}</span>
+        </p>
+        <p class="comment-img" v-if='commentInfo.images'>
+          <img v-for='(item,index) in commentInfo.images' :src="item" alt="">
         </p>
       </div>
     </div>
@@ -38,12 +42,6 @@
         let date = new Date(value * 1000);
         return formatDate(date, 'yyyy-MM-dd')
       }
-    },
-    watch: {
-      commentInfo() {
-        console.log(this.commentInfo);
-
-      }
     }
   }
 
@@ -52,6 +50,11 @@
   .detail-comment-info {
     padding-bottom: 20px;
     border-bottom: 4px solid rgba(100, 100, 100, .07);
+  }
+
+  .nocomment {
+    text-align: center;
+    margin: 10px;
   }
 
   .comment-top {
@@ -111,6 +114,16 @@
 
   .deta {
     margin-right: 10px;
+  }
+
+  .comment-img {
+    display: flex;
+  }
+
+  .comment-img img {
+    width: 70px;
+    height: 70px;
+    margin-right: 5px;
   }
 
 </style>
