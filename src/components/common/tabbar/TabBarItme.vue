@@ -1,5 +1,5 @@
 <template>
-  <div class="tab-bar-item" @click='tabitemClick'>
+  <div class="tab-bar-item ignore" @click='tabitemClick'>
     <div v-if='!isActive'>
       <slot name='item-icon'></slot>
     </div>
@@ -50,6 +50,7 @@
     },
     components: {}
   }
+
 </script>
 <style>
   .tab-bar-item {
@@ -64,4 +65,5 @@
     margin-top: 3px;
     vertical-align: middle;
   }
+
 </style>

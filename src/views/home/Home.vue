@@ -10,7 +10,7 @@
       ref='tabControl1'>
     </tab-control>
     <!-- 滚动插件 -->
-    <scroll class="content" ref='scroll' :probe-type=3 @scroll='onscrollTop' :pull-up-load='true'
+    <scroll class="home-scroll" ref='scroll' :probe-type=3 @scroll='onscrollTop' :pull-up-load='true'
       @pullingUp='pullingUp'>
       <!-- 轮播图 -->
       <home-swiper :banners='banners' @swiperImageLoad='swiperImageLoad'></home-swiper>
@@ -192,7 +192,7 @@
     z-index: 10;
   }
 
-  .content {
+  .home-scroll {
     position: fixed;
     top: 44px;
     left: 0px;
